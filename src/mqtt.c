@@ -643,8 +643,10 @@ ssize_t __mqtt_recv(struct mqtt_client *client)
     ssize_t mqtt_recv_ret = MQTT_OK;
     MQTT_PAL_MUTEX_LOCK(&client->mutex);
 
-    /* read until there is nothing left to read, or there was an error */
-    while(mqtt_recv_ret == MQTT_OK) {
+    /* read until there is nothing left to read, or there was an error,
+       or a control publish was received */
+    while(mqtt_recv_ret == MQTT_OK
+          && response.fixed_header.control_type != MQTT_CONTROL_PUBLISH ) {
         /* read in as many bytes as possible */
         ssize_t rv, consumed;
         struct mqtt_queued_message *msg = NULL;
